@@ -12,6 +12,9 @@ function App() {
   const onBtnRef = useRef(null);
   const offBtnRef = useRef(null);
 
+  let onBtnWidth;
+  let onBtnHeight;
+
   // 애니메이션 재생 제어 상태값
   const [trig, doTrig] = useState(false);
 
@@ -36,6 +39,9 @@ function App() {
     // 생성된 애니메이션 객체 참조 변수에 전달.
     onBtnRef.current = onBtn;
     offBtnRef.current = offBtn;
+
+    onBtnWidth = onBtnRef.current.nominalBounds.width / 2;
+    onBtnHeight = onBtnRef.current.nominalBounds.height / 2;
 
     // 스테이지 생성 후, onBtn 애니메이션 출력.
     const stage = new window.createjs.Stage(canvasRef.current);
@@ -129,8 +135,14 @@ function App() {
 
     canvasRef.current.width = window.innerWidth;
     canvasRef.current.height = window.innerHeight;
+    onBtnRef.current.x = (window.innerWidth / 2);
+    offBtnRef.current.x = window.innerWidth / 2;
+    onBtnRef.current.y = (window.innerHeight / 2);
+    offBtnRef.current.y = window.innerHeight / 2;
     console.log("resize 됩니다.")
   }
+
+      
 
   return ( // HTML 요소 정의.
     <>
