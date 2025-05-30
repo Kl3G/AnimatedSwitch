@@ -1,0 +1,29 @@
+
+* {
+
+  padding: 0;
+  margin: 0;
+}
+
+html {
+
+  height: 100%;
+  width: 100%;
+}
+
+body {
+
+  height: 100%;
+  width: 100%;
+  background-color: #0E2148;
+}
+
+#root {
+
+  height: 100%;
+  width: 100%;
+}
+
+canvas {
+  display: block;
+}
