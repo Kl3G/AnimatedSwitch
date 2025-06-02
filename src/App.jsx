@@ -99,7 +99,26 @@ function App() {
       console.log("애니메이션2 끝!");
       stage.removeChild(offBtn);
       stage.addChild(onBtn);
+      
+      // async/await로 개선해 보자.
       canvasRef.current.style.backgroundColor = '#FED16A';
+      setTimeout(() => {
+
+        canvasRef.current.style.backgroundColor = '#0E2148';
+        setTimeout(() => {
+
+          canvasRef.current.style.backgroundColor = '#FED16A';
+          setTimeout(() => {
+
+            canvasRef.current.style.backgroundColor = '#0E2148';
+            setTimeout(() => {
+
+              canvasRef.current.style.backgroundColor = '#FED16A';
+              canvasRef.current.style.transition = 'all 4s'
+            }, 10);
+          }, 75);
+        }, 125);
+      }, 250);
       onBtn.stop();
     });
 
