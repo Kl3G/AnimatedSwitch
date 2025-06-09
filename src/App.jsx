@@ -7,17 +7,17 @@ import './App.css'
 
 function App() {
 
+  // 애니메이션 재생 제어 상태값.
+  const [trig, doTrig] = useState(false);
+
   // 객체를 참조할 변수들 생성.
   const canvasRef = useRef(null);
   const onBtnRef = useRef(null);
   const offBtnRef = useRef(null);
+  const objWidth = useRef(null);
+  const objHeight = useRef(null);
 
-  let objWidth;
-  let objHeight;
-
-  // 애니메이션 재생 제어 상태값
-  const [trig, doTrig] = useState(false);
-
+  // HTML 요소 생성 후 실행할 작업. 
   useEffect(() => {
 
     // 컴포지션 가져오기.
@@ -29,13 +29,13 @@ function App() {
     const offBtnLib = offBtnComp.getLibrary();
 
     // 중앙 정렬 위해 객체 너비와 높이의 절반 가져오기.
-    objWidth = onBtnLib.properties.width / 2;
-    objHeight = onBtnLib.properties.height / 2;
+    objWidth.current = onBtnLib.properties.width / 2;
+    objHeight.current = onBtnLib.properties.height / 2;
 
     // 라이브러리로 객체 애니메이션 객체 생성.
     const onBtn = new onBtnLib.buttonOn();
     const offBtn = new offBtnLib.button();
-    
+
     offBtn.scaleX = 1;
     offBtn.scaleY = 1;
     // 화면에 출력되는 크기"만 바꿀 뿐,
@@ -51,10 +51,10 @@ function App() {
     canvasRef.current.height = window.innerHeight;
 
     // 애니메이션 객체의 초기 위치 설정.
-    onBtnRef.current.x = (window.innerWidth / 2) - objWidth;
-    onBtnRef.current.y = (window.innerHeight / 2) - objHeight;
-    offBtnRef.current.x = (window.innerWidth / 2) - objWidth;
-    offBtnRef.current.y = (window.innerHeight / 2) - objHeight;
+    onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
+    onBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
+    offBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
+    offBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
 
     // 스테이지 생성 후, onBtn 애니메이션 출력.
     const stage = new window.createjs.Stage(canvasRef.current);
@@ -82,44 +82,52 @@ function App() {
     // onBtn 마지막 프레임에서 발생하는 'animationEnd' 등록.
     onBtn.addEventListener("animationEnd", function () {
 
+      canvasRef.current.style.backgroundColor = '#0E2148';
       onBtn.gotoAndStop(0);
       doTrig(trig => !trig);
       console.log("애니메이션1 끝!");
       stage.removeChild(onBtn);
       stage.addChild(offBtn);
-      canvasRef.current.style.backgroundColor = '#0E2148';
       offBtn.stop();
     });
 
     // onBtn 마지막 프레임에서 발생하는 'animationEnd2' 등록.
     offBtn.addEventListener('animationEnd2', function () {
 
+      canvasRef.current.style.transition = ''; // transition 효과 초기화.
+      canvasRef.current.style.backgroundColor = '#FED16A';
       offBtn.gotoAndStop(0);
       doTrig(trig => !trig);
       console.log("애니메이션2 끝!");
       stage.removeChild(offBtn);
       stage.addChild(onBtn);
-      
-      // async/await로 개선해 보자.
-      canvasRef.current.style.backgroundColor = '#FED16A';
-      setTimeout(() => {
+      onBtn.stop();
 
-        canvasRef.current.style.backgroundColor = '#0E2148';
-        setTimeout(() => {
+      // 코드의 순서를 명확하게 표현하기 위해 async/await로 개선.
+      function setLight(color, ms) {
 
-          canvasRef.current.style.backgroundColor = '#FED16A';
+        return new Promise((resolve) => {
+          
           setTimeout(() => {
 
-            canvasRef.current.style.backgroundColor = '#0E2148';
-            setTimeout(() => {
+            canvasRef.current.style.backgroundColor = color;
+            resolve();
+          }, ms);
+        });
+      };
 
-              canvasRef.current.style.backgroundColor = '#FED16A';
-              canvasRef.current.style.transition = 'all 4s'
-            }, 10);
-          }, 75);
-        }, 125);
-      }, 250);
-      onBtn.stop();
+      async function flash() {
+
+        await setLight('#0E2148', 1000);
+        await setLight('#FED16A', 1000);
+        await setLight('#0E2148', 1000);
+        await setLight('#FED16A', 1000);
+        canvasRef.current.style.transition = 'all 3s ease';
+      };
+
+      flash()
+      .then(result => console.log('async completed.'))
+      .catch(reject => console.log('async error.'));
     });
 
     // resize 이벤트 리스너 등록.
@@ -131,7 +139,7 @@ function App() {
       // 비동기 함수의 예측 불가능한 동작과 메모리 누수 방지를 주의.
       onBtn.removeEventListener('click', onOff);
       offBtn.removeEventListener('click', onOff);
-      window.addEventListener('resize', resizeHandler);
+      window.removeEventListener('resize', resizeHandler);
       // 초기 마운트 과정에서 리스너가 두 번 등록되는 것 주의.
     };
   }, []);
@@ -141,9 +149,7 @@ function App() {
 
     doTrig((trig) => { // 상태 변경 함수 정의.
 
-      console.log('previous state is ' + trig);
       const check = !trig;
-      console.log('new state is ' + check);
       if (check) {
 
         onBtnRef.current.play();
@@ -162,16 +168,15 @@ function App() {
 
   }
 
-  // resize될 때 컨버스 배경 동적 변화.
+  // resize될 때 컨버스 배경 동적 변화 함수.
   function resizeHandler () {
 
     canvasRef.current.width = window.innerWidth;
     canvasRef.current.height = window.innerHeight;
-    onBtnRef.current.x = (window.innerWidth / 2) - objWidth;
-    offBtnRef.current.x = (window.innerWidth / 2) - objWidth;
-    onBtnRef.current.y = (window.innerHeight / 2) - objHeight;
-    offBtnRef.current.y = (window.innerHeight / 2) - objHeight;
-    console.log("resize 됩니다.")
+    onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
+    offBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
+    onBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
+    offBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
   }
 
   return ( // HTML 요소 정의.
