@@ -2,7 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // 렌더링된 App.jsx 컴포넌트를 실제로 DOM에 그려 넣는 역할.
 import App from './App.jsx'
-import Root from './Root';
 import './index.css'
 
 createRoot(document.getElementById('root')).render(

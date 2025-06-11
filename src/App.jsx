@@ -154,9 +154,6 @@ function App() {
 
         onBtnRef.current.stop();
         offBtnRef.current.stop();
-      }else {
-
-        console.log('trigError');
       }
 
       return check; // 깜빡하면 큰일.
@@ -167,8 +164,8 @@ function App() {
   // resize될 때 컨버스 배경 동적 변화 함수.
   function resizeHandler () {
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvasRef.width = window.innerWidth;
+    canvasRef.height = window.innerHeight;
     onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
     offBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
     onBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
