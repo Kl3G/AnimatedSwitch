@@ -1,7 +1,7 @@
 
 
 // App.jsx
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import './App.css'
 
@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
 
     // canvas.current 계속 적기 귀찮으니까 canvas로 담기.
-    const canvas = canvasRef.current 
+    const canvas = canvasRef.current;
 
     // 컴포지션 가져오기.
     const onBtnComp = window.AdobeAn.getComposition('DEB6C5E970280F44A64283FA1AB84A55');
@@ -39,14 +39,14 @@ function App() {
     const onBtn = new onBtnLib.buttonOn();
     const offBtn = new offBtnLib.button();
 
-    offBtn.scaleX = 1;
-    offBtn.scaleY = 1;
-    // 화면에 출력되는 크기"만 바꿀 뿐, js 코드 상의 객체 속성이나 
-    // nominalBounds에는 전혀 영향을 주지 않음.
-
     // 생성된 애니메이션 객체 참조 변수에 전달.
     onBtnRef.current = onBtn;
     offBtnRef.current = offBtn;
+
+    // 화면에 출력되는 크기"만 바꿀 뿐, js 코드 상의 객체 속성이나 
+    // nominalBounds에는 전혀 영향을 주지 않음.
+    offBtn.scaleX = 1;
+    offBtn.scaleY = 1;
 
     // 캔버스의 너비, 높이 설정.
     canvas.width = window.innerWidth;
@@ -164,8 +164,8 @@ function App() {
   // resize될 때 컨버스 배경 동적 변화 함수.
   function resizeHandler () {
 
-    canvasRef.width = window.innerWidth;
-    canvasRef.height = window.innerHeight;
+    canvasRef.current.width = window.innerWidth;
+    canvasRef.current.height = window.innerHeight;
     onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
     offBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
     onBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
