@@ -48,10 +48,6 @@ function App() {
     offBtn.scaleX = 1;
     offBtn.scaleY = 1;
 
-    // 캔버스의 너비, 높이 설정.
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
     // 애니메이션 객체의 초기 위치 설정.
     onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
     onBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
