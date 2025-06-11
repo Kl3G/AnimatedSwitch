@@ -12,6 +12,7 @@ function App() {
 
   // 객체를 참조할 변수들 생성.
   const canvasRef = useRef(null);
+  const ctxRef = useRef(null);
   const onBtnRef = useRef(null);
   const offBtnRef = useRef(null);
   const objWidth = useRef(null);
@@ -19,6 +20,9 @@ function App() {
 
   // HTML 요소 생성 후 실행할 작업. 
   useEffect(() => {
+
+    // canvas.current 계속 적기 귀찮으니까 canvas로 담기.
+    const canvas = canvasRef.current 
 
     // 컴포지션 가져오기.
     const onBtnComp = window.AdobeAn.getComposition('DEB6C5E970280F44A64283FA1AB84A55');
@@ -38,8 +42,7 @@ function App() {
 
     offBtn.scaleX = 1;
     offBtn.scaleY = 1;
-    // 화면에 출력되는 크기"만 바꿀 뿐,
-    // js 코드 상의 객체 속성이나 
+    // 화면에 출력되는 크기"만 바꿀 뿐, js 코드 상의 객체 속성이나 
     // nominalBounds에는 전혀 영향을 주지 않음.
 
     // 생성된 애니메이션 객체 참조 변수에 전달.
@@ -47,8 +50,11 @@ function App() {
     offBtnRef.current = offBtn;
 
     // 캔버스의 너비, 높이 설정.
-    canvasRef.current.width = window.innerWidth;
-    canvasRef.current.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // 캔버스 context 생성
+    ctxRef.current = canvas.getContext('2d');
 
     // 애니메이션 객체의 초기 위치 설정.
     onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
@@ -57,7 +63,7 @@ function App() {
     offBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
 
     // 스테이지 생성 후, onBtn 애니메이션 출력.
-    const stage = new window.createjs.Stage(canvasRef.current);
+    const stage = new window.createjs.Stage(canvas);
     stage.addChild(offBtn);
 
     // Ticker 설정 후, stage 객체에서 handleEvent() 실행.
@@ -65,8 +71,8 @@ function App() {
     window.createjs.Ticker.addEventListener('tick', stage);
 
     // 애니메이션은 최초 정지 상태.
-    offBtn.stop();
     // 진입점은 stage content 주석 아래부터.
+    offBtn.stop();
 
     // 버튼 스위치 기능 이벤트 등록.
     onBtn.addEventListener('click', onOff);
@@ -82,7 +88,7 @@ function App() {
     // onBtn 마지막 프레임에서 발생하는 'animationEnd' 등록.
     onBtn.addEventListener("animationEnd", function () {
 
-      canvasRef.current.style.backgroundColor = '#0E2148';
+      canvas.style.backgroundColor = '#0E2148';
       onBtn.gotoAndStop(0);
       doTrig(trig => !trig);
       console.log("애니메이션1 끝!");
@@ -94,8 +100,8 @@ function App() {
     // onBtn 마지막 프레임에서 발생하는 'animationEnd2' 등록.
     offBtn.addEventListener('animationEnd2', function () {
 
-      canvasRef.current.style.transition = ''; // transition 효과 초기화.
-      canvasRef.current.style.backgroundColor = '#FED16A';
+      canvas.style.transition = ''; // transition 효과 초기화.
+      canvas.style.backgroundColor = '#FED16A';
       offBtn.gotoAndStop(0);
       doTrig(trig => !trig);
       console.log("애니메이션2 끝!");
@@ -103,26 +109,20 @@ function App() {
       stage.addChild(onBtn);
       onBtn.stop();
 
-      // 코드의 순서를 명확하게 표현하기 위해 async/await로 개선.
-      function setLight(color, ms) {
-
-        return new Promise((resolve) => {
-          
-          setTimeout(() => {
-
-            canvasRef.current.style.backgroundColor = color;
-            resolve();
-          }, ms);
-        });
-      };
-
+      // 전구 깜빡이는 효과.
       async function flash() {
 
-        await setLight('#0E2148', 1000);
-        await setLight('#FED16A', 1000);
-        await setLight('#0E2148', 1000);
-        await setLight('#FED16A', 1000);
-        canvasRef.current.style.transition = 'all 3s ease';
+        await setLight('#0E2148', 500);
+        await setLight('#FED16A', 50);
+        await setLight('#0E2148', 50);
+        await setLight('#FED16A', 50);
+        await setLight('#0E2148', 50);
+        await setLight('#FED16A', 700);
+        await setLight('#0E2148', 500);
+        await setLight('#FED16A', 50);
+        await setLight('#0E2148', 50);
+        await setLight('#FED16A', 500);
+        canvas.style.transition = 'all 1.5s ease';
       };
 
       flash()
@@ -171,13 +171,27 @@ function App() {
   // resize될 때 컨버스 배경 동적 변화 함수.
   function resizeHandler () {
 
-    canvasRef.current.width = window.innerWidth;
-    canvasRef.current.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
     offBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
     onBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
     offBtnRef.current.y = (window.innerHeight / 2) - objHeight.current;
   }
+
+  // Canvas의 backgroundColor 변경 함수.
+  // 코드의 순서를 명확하게 표현하기 위해 async/await로 개선.
+  function setLight(color, ms) {
+
+    return new Promise((resolve) => {
+      
+      setTimeout(() => {
+
+        canvasRef.current.style.backgroundColor = color;
+        resolve();
+      }, ms);
+    });
+  };
 
   return ( // HTML 요소 정의.
     <>
