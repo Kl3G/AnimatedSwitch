@@ -12,7 +12,6 @@ function App() {
 
   // 객체를 참조할 변수들 생성.
   const canvasRef = useRef(null);
-  const ctxRef = useRef(null);
   const onBtnRef = useRef(null);
   const offBtnRef = useRef(null);
   const objWidth = useRef(null);
@@ -52,9 +51,6 @@ function App() {
     // 캔버스의 너비, 높이 설정.
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    // 캔버스 context 생성
-    ctxRef.current = canvas.getContext('2d');
 
     // 애니메이션 객체의 초기 위치 설정.
     onBtnRef.current.x = (window.innerWidth / 2) - objWidth.current;
